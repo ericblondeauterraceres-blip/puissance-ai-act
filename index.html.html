@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'AI Act — PME/PMI · PUISSANCE AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bl:#0A5CFF;--bl2:#003ECF;--bl-lt:#EBF0FF;--bl-mid:#C2D0FF;
+  --bk:#0C0C0C;--ink:#1A1A1A;--sub:#52525B;--mute:#9CA3AF;
+  --brd:#E5E7EB;--bg:#F9FAFB;--wh:#FFFFFF;
+  --rd:#DC2626;--rd-lt:#FEF2F2;--am:#B45309;--am-lt:#FFFBEB;
+  --gn:#15803D;--gn-lt:#F0FDF4;
+  --fh:'Playfair Display',Georgia,serif;
+  --fb:'DM Sans',Helvetica,sans-serif;
+  
+}
+html,body{width:100%;height:100%;font-family:var(--fb);overflow:hidden;background:#CBD5E1}
+.slide{display:none;position:fixed;inset:0;flex-direction:row}
+#sl0{display:flex}
+
+/* ══ SLIDE BODY ══ */
+.sbd{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ══ PROGRESS ══ */
+#prog{position:fixed;top:0;left:0;right:0;height:3px;background:#E5E7EB;z-index:99}
+#pf{height:100%;background:var(--bl);width:0%;transition:width .3s}
+
+/* ══ NAV ══ */
+#nav{position:fixed;bottom:22px;right:26px;display:flex;align-items:center;gap:12px;z-index:99}
+.nb{width:44px;height:44px;border-radius:50%;background:var(--bl);border:none;cursor:pointer;color:var(--wh);font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.nb:hover{background:var(--bl2)}
+.nb:disabled{background:#D1D5DB;cursor:default}
+#sc{font-family:var(--fb);font-size:11px;font-weight:500;color:#9CA3AF;min-width:40px;text-align:center}
+
+/* ══ RESOURCE BTN ══ */
+
+#rbtn:hover{border-color:var(--bl);color:var(--bl)}
+
+/* ══ PANEL ══ */
+#panel{position:fixed;top:0;right:0;bottom:0;width:460px;background:var(--wh);border-left:1px solid var(--brd);z-index:999;transform:translateX(100%);transition:transform .3s;display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.15)}
+#panel.open{transform:translateX(0)}
+.ph{padding:22px 26px 18px;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
+.ph-t{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--bk)}
+.ph-s{font-family:var(--fb);font-size:11px;color:var(--mute);margin-top:4px;line-height:1.5}
+.pcls{width:30px;height:30px;border:1px solid var(--brd);background:none;border-radius:4px;cursor:pointer;font-size:16px;color:var(--sub)}
+.pcls:hover{background:var(--bg)}
+.pc{overflow-y:auto;flex:1;padding:16px 26px 28px}
+.pcard{border:1px solid var(--brd);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.pcard.open{border-color:var(--bl)}
+.pc-h{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;cursor:pointer;user-select:none}
+.pc-h:hover{background:var(--bg)}
+.pc-ico{width:32px;height:32px;border-radius:6px;background:var(--bl-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pc-ico svg{width:15px;height:15px;fill:none;stroke:var(--bl);stroke-width:2;stroke-linecap:round}
+.pc-info{flex:1}
+.pc-doc{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--bl);margin-bottom:2px}
+.pc-name{font-family:var(--fb);font-size:12.5px;font-weight:600;color:var(--bk);line-height:1.3}
+.pc-meta{font-family:var(--fb);font-size:10.5px;color:var(--mute);margin-top:2px}
+.pc-chev{font-size:14px;color:var(--mute);transition:transform .2s;flex-shrink:0;margin-top:2px}
+.pcard.open .pc-chev{transform:rotate(180deg)}
+.pc-b{display:none;padding:0 15px 13px;border-top:1px solid var(--brd)}
+.pcard.open .pc-b{display:block}
+.pc-body{font-family:var(--fb);font-size:11.5px;color:#374151;line-height:1.8;padding-top:11px}
+.pc-body strong{color:var(--bk);font-weight:600}
+.pc-body ul{margin:5px 0 5px 15px}
+.pc-body li{margin-bottom:3px}
+.ptags{display:flex;flex-wrap:wrap;gap:4px;margin:9px 0 7px}
+.ptag{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:3px}
+.pr{background:var(--rd-lt);color:var(--rd)}.pb{background:var(--bl-lt);color:var(--bl)}.pa{background:var(--am-lt);color:var(--am)}.pg{background:var(--gn-lt);color:var(--gn)}
+.dl-sep{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9CA3AF;padding-top:9px;margin-top:9px;border-top:1px solid var(--brd);margin-bottom:7px;display:block}
+.dlb{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:5px;font-family:var(--fb);font-size:11.5px;font-weight:600;cursor:pointer;width:100%;margin-bottom:4px;border:none;text-decoration:none;transition:all .2s}
+.dlb-p{background:var(--bl);color:var(--wh)}.dlb-p:hover{background:var(--bl2)}
+.dlb-s{background:var(--bg);color:var(--ink);border:1px solid var(--brd)}.dlb-s:hover{border-color:var(--bl);color:var(--bl)}
+
+/* ══ SLIDE COMMON ══ */
+.pad{padding:40px 64px 32px;display:flex;flex-direction:column;height:100%}
+.slide-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-shrink:0}
+.slide-label{font-family:var(--fb);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--bl);margin-bottom:7px}
+.slide-title{font-family:var(--fh);font-size:clamp(24px,2.8vw,36px);font-weight:700;color:var(--bk);line-height:1.1}
+.slide-num{font-family:var(--fh);font-size:76px;font-weight:800;color:#F0F0F0;line-height:1;flex-shrink:0}
+
+/* ══ SLIDE 0 — COVER ══ */
+#sl0 .sbd{background:var(--wh)}
+.s1-wrap{padding:48px 68px 40px 64px;display:flex;flex-direction:column;height:100%}
+.s1-kicker{font-family:var(--fb);font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--bl);margin-bottom:42px}
+.s1-mid{flex:1;display:flex;flex-direction:column;justify-content:center}
+.s1-h1{font-family:var(--fh);font-size:clamp(34px,4.2vw,56px);font-weight:800;line-height:1.07;color:var(--bk);letter-spacing:-.02em;margin-bottom:16px}
+.s1-h1 .ac{color:var(--bl);font-style:italic}
+.s1-sub{font-family:var(--fb);font-size:17px;font-weight:300;color:var(--sub);line-height:1.65;max-width:520px;margin-bottom:30px}
+.s1-pills{display:flex;gap:10px;flex-wrap:wrap}
+.s1-pill{display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--brd);border-radius:3px;font-family:var(--fb);font-size:12px;font-weight:500;color:var(--ink)}
+.s1-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.s1-foot{display:flex;align-items:center;justify-content:space-between;padding-top:22px;border-top:1px solid var(--brd);margin-top:auto}
+.s1-date{font-family:var(--fb);font-size:11px;color:#9CA3AF}
+.s1-brand{font-family:var(--fb);font-size:12px;font-weight:500;color:var(--bk);display:flex;align-items:center;gap:8px}
+.s1-brand b{color:var(--bl)}
+
+/* ══ SLIDE 1 — SYNTHÈSE ══ */
+#sl1 .sbd{background:var(--wh)}
+.s2-cols{display:grid;grid-template-columns:repeat(3,1fr);flex:1;border:1px solid var(--brd);border-radius:8px;overflow:hidden}
+.s2-col{padding:26px 22px;display:flex;flex-direction:column;gap:12px;border-right:1px solid var(--brd)}
+.s2-col:last-child{border-right:none}
+.s2-col:nth-child(2){background:var(--bg)}
+.s2-num{font-family:var(--fh);font-size:44px;font-weight:800;color:var(--bl);line-height:1}
+.s2-head{font-family:var(--fb);font-size:14px;font-weight:700;color:var(--bk);line-height:1.3;padding-bottom:10px;border-bottom:2px solid var(--bl)}
+.s2-body{font-family:var(--fb);font-size:13px;color:var(--sub);line-height:1.72;flex:1}
+.s2-body strong{color:var(--ink);font-weight:600}
+.s2-badge{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:3px;align-self:flex-start}
+.s2br{background:var(--rd-lt);color:var(--rd)}.s2bb{background:var(--bl-lt);color:var(--bl)}.s2ba{background:var(--am-lt);color:var(--am)}
+.s2-quote{font-family:var(--fb);font-size:13.5px;color:var(--ink);line-height:1.75;font-style:italic;padding:14px 18px;background:var(--bl-lt);border-left:3px solid var(--bl);border-radius:0 6px 6px 0;margin-top:18px;flex-shrink:0}
+.s2-quote strong{font-style:normal;font-weight:700;color:var(--bk)}
+
+/* ══ SLIDE 2 — CALENDRIER ══ */
+#sl2 .sbd{background:var(--wh)}
+.dep-box{background:var(--bl-lt);border:1px solid var(--bl-mid);border-radius:6px;padding:12px 17px;display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;flex-shrink:0}
+.dep-ico{width:32px;height:32px;border-radius:5px;background:var(--wh);border:1px solid var(--bl-mid);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dep-ico svg{width:15px;height:15px;fill:none;stroke:var(--bl);stroke-width:1.8}
+.dep-txt{font-family:var(--fb);font-size:12px;color:var(--ink);line-height:1.7}
+.dep-txt strong{color:var(--bl);font-weight:700}
+.tl{flex:1;position:relative;padding-left:124px;display:flex;flex-direction:column;justify-content:space-evenly}
+.tl-spine{position:absolute;left:107px;top:10px;bottom:10px;width:1px;background:var(--brd)}
+.tl-row{position:relative;padding:9px 0 9px 25px}
+.tl-row+.tl-row{border-top:1px solid #F3F4F6}
+.tl-node{position:absolute;left:-8px;top:15px;width:16px;height:16px;border-radius:50%;background:var(--wh);border:2px solid var(--brd)}
+.past .tl-node{background:var(--gn);border-color:var(--gn)}
+.now .tl-node{background:var(--bl);border-color:var(--bl);width:20px;height:20px;left:-10px;top:13px;box-shadow:0 0 0 5px rgba(10,92,255,.14)}
+.tl-lbl{position:absolute;right:calc(100% + 20px);top:11px;text-align:right;white-space:nowrap;font-family:var(--fb);font-size:12.5px;font-weight:700;color:var(--ink)}
+.now .tl-lbl{color:var(--bl);font-size:13.5px;font-weight:800}
+.tl-status{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.past .tl-status{color:var(--gn)}.now .tl-status{color:var(--bl)}.future .tl-status{color:var(--mute)}
+.tl-ttl{font-family:var(--fb);font-size:13.5px;font-weight:700;color:var(--bk);line-height:1.3;margin-bottom:3px}
+.tl-desc{font-family:var(--fb);font-size:11.5px;color:var(--sub);line-height:1.65}
+.tl-ok{font-family:var(--fb);font-size:11px;font-weight:600;color:var(--gn);margin-top:4px}
+.tl-sanc{display:inline-block;margin-top:6px;font-family:var(--fb);font-size:11px;font-weight:700;color:var(--rd);background:var(--rd-lt);border:1px solid #FECACA;padding:4px 10px;border-radius:3px}
+.tl-hl{background:var(--bl-lt);border:1.5px solid var(--bl-mid);border-radius:7px;padding:12px 15px;margin-top:3px}
+.tl-hl .tl-ttl{color:var(--bl)}
+
+/* ══ SLIDE 3 — 3 HORIZONS ══ */
+#sl3 .sbd{background:var(--bg)}
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;flex:1}
+.rc{border-radius:10px;padding:26px 22px;display:flex;flex-direction:column;gap:9px;color:var(--wh)}
+.rc0{background:linear-gradient(145deg,#4E90FF 0%,#2B72F0 100%);box-shadow:0 4px 20px rgba(43,114,240,.25)}
+.rc1{background:linear-gradient(145deg,#1A5EE0 0%,#0A48C2 100%);box-shadow:0 4px 20px rgba(10,72,194,.3)}
+.rc2{background:linear-gradient(145deg,#0A37A4 0%,#052280 100%);box-shadow:0 4px 20px rgba(5,34,128,.35)}
+.rc-tag{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:3px 8px;border-radius:2px;background:rgba(255,255,255,.18);color:rgba(255,255,255,.85);align-self:flex-start}
+.rc-name{font-family:var(--fh);font-size:21px;font-weight:700;line-height:1.15;color:var(--wh)}
+.rc-desc{font-family:var(--fb);font-size:12px;line-height:1.65;color:rgba(255,255,255,.75)}
+.rc-div{height:1px;margin:3px 0;background:rgba(255,255,255,.18)}
+.rc-items{display:flex;flex-direction:column;gap:7px;flex:1}
+.rc-item{display:flex;align-items:flex-start;gap:7px;font-family:var(--fb);font-size:12px;line-height:1.5;color:rgba(255,255,255,.88)}
+.rc-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:6px;background:rgba(255,255,255,.55)}
+.rc-ams-block{margin-top:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.rc-ams-text{flex:1}
+.rc-ams-label{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:2px}
+.rc-ams-title{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--wh);line-height:1.2}
+.rc-ams-sub{font-family:var(--fb);font-size:10.5px;color:rgba(255,255,255,.62);margin-top:2px;line-height:1.4}
+.rc-qr{width:58px;height:58px;border-radius:5px;overflow:hidden;flex-shrink:0;background:var(--wh);padding:3px}
+.rc-qr img{width:100%;height:100%;display:block}
+
+/* ══ SLIDE 4 — 7 DOCS avec HOVER ══ */
+#sl4 .sbd{background:var(--wh)}
+.s5-pad{padding:36px 56px 24px;display:flex;flex-direction:column;height:100%}
+.dg{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:9px;flex:1}
+.dc{border:1px solid var(--brd);border-radius:8px;padding:0;display:flex;flex-direction:column;cursor:default;background:var(--wh);position:relative;overflow:hidden;transition:border-color .18s}
+.dc:hover{border-color:var(--bl);z-index:10}
+.dc-front{padding:14px 13px 12px;display:flex;flex-direction:column;gap:5px;height:100%;transition:opacity .18s}
+.dc:hover .dc-front{opacity:0}
+.dc-n{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--bl)}
+.dc-name{font-family:var(--fb);font-size:12.5px;font-weight:600;color:var(--bk);line-height:1.3;flex:1}
+.dc-tl{font-family:var(--fb);font-size:10.5px;color:var(--mute);line-height:1.4}
+.dc-pri{font-family:var(--fb);font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:3px;align-self:flex-start;margin-top:2px}
+.dc-hover{position:absolute;inset:0;background:var(--bl);color:var(--wh);padding:14px 13px 12px;display:flex;flex-direction:column;gap:6px;opacity:0;transition:opacity .2s;pointer-events:none}
+.dc:hover .dc-hover{opacity:1}
+.dh-title{font-family:var(--fb);font-size:11px;font-weight:700;color:var(--wh);line-height:1.25;border-bottom:1px solid rgba(255,255,255,.25);padding-bottom:5px;margin-bottom:2px}
+.dh-effet{font-family:var(--fb);font-size:10px;color:rgba(255,255,255,.75);line-height:1.4}
+.dh-effet strong{color:var(--wh);font-weight:600}
+.dh-list{list-style:none;display:flex;flex-direction:column;gap:3px;flex:1;overflow:hidden}
+.dh-list li{font-family:var(--fb);font-size:10px;color:rgba(255,255,255,.85);line-height:1.4;padding-left:10px;position:relative}
+.dh-list li::before{content:'—';position:absolute;left:0;color:rgba(255,255,255,.5)}
+.dh-fond{font-family:var(--fb);font-size:9.5px;color:rgba(255,255,255,.55);line-height:1.4;border-top:1px solid rgba(255,255,255,.18);padding-top:5px;margin-top:2px}
+.dh-fond strong{color:rgba(255,255,255,.75);font-weight:600}
+.dh-tags{display:flex;flex-wrap:wrap;gap:3px}
+.tag{font-family:var(--fb);font-size:8px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:2px}
+.tr{background:rgba(255,255,255,.9);color:#B91C1C}
+.tb{background:rgba(255,255,255,.2);color:var(--wh)}
+.ta{background:rgba(255,255,255,.9);color:#92400E}
+.tg{background:rgba(255,255,255,.9);color:#15803D}
+/* priority badges on front */
+.pr{background:var(--rd-lt);color:var(--rd)}
+.pb{background:var(--bl-lt);color:var(--bl)}
+.pa{background:var(--am-lt);color:var(--am)}
+.pg{background:var(--gn-lt);color:var(--gn)}
+
+
+.dl-note{font-family:var(--fb);font-size:11px;color:var(--mute);text-align:center;padding:8px 0 2px;font-style:italic}
+
+/* ── SLIDE 5 : document cards avec hover ── */
+.dc{border:1px solid var(--brd);border-radius:8px;padding:0;display:flex;flex-direction:column;cursor:default;background:var(--wh);position:relative;overflow:hidden;transition:border-color .18s,box-shadow .18s;height:100%}
+.dc:hover{border-color:var(--bl);box-shadow:0 4px 20px rgba(10,92,255,.12);z-index:10}
+.dc-front{padding:14px 13px 12px;display:flex;flex-direction:column;gap:5px;height:100%;transition:opacity .15s}
+.dc:hover .dc-front{opacity:0}
+.dc-n{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--bl)}
+.dc-name{font-family:var(--fb);font-size:12.5px;font-weight:600;color:var(--bk);line-height:1.3;flex:1}
+.dc-tl{font-family:var(--fb);font-size:10.5px;color:var(--mute);line-height:1.4}
+.dc-pri{font-family:var(--fb);font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:3px;align-self:flex-start;margin-top:2px}
+.dc-hover{position:absolute;inset:0;background:#FFFFFF;border:2px solid var(--bl);border-radius:8px;padding:13px 13px 11px;opacity:0;transition:opacity .18s;pointer-events:none;display:flex;flex-direction:column;gap:7px}
+.dc:hover .dc-hover{opacity:1;pointer-events:all}
+.dh-title{font-family:var(--fb);font-size:11.5px;font-weight:700;color:var(--bk);line-height:1.25;padding-bottom:6px;border-bottom:1.5px solid var(--bl)}
+.dh-desc{font-family:var(--fb);font-size:10.5px;color:var(--sub);line-height:1.55;flex:1}
+.dh-tags{display:flex;flex-wrap:wrap;gap:3px}
+.dh-dl{display:flex;flex-direction:column;gap:5px;margin-top:auto;padding-top:6px;border-top:1px solid var(--brd)}
+.dh-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 10px;border-radius:5px;font-family:var(--fb);font-size:11px;font-weight:700;text-decoration:none;transition:all .18s;text-align:center;width:100%}
+.dh-btn-p{background:var(--bl);color:#FFFFFF}.dh-btn-p:hover{background:var(--bl2)}
+.dh-btn-s{background:var(--bg);color:var(--bk);border:1.5px solid var(--brd)}.dh-btn-s:hover{border-color:var(--bl);color:var(--bl)}
+.dh-btn-dis{background:#F3F4F6;color:#9CA3AF;border:1px solid #E5E7EB;cursor:not-allowed}
+
+/* ── SLIDE 5 : cards ── */
+.dc{border:1px solid var(--brd);border-radius:8px;padding:0;display:flex;flex-direction:column;cursor:default;background:var(--wh);position:relative;overflow:hidden;transition:border-color .18s,box-shadow .18s;height:100%}
+.dc:hover{border-color:var(--bl);box-shadow:0 4px 20px rgba(10,92,255,.13);z-index:10}
+.dc-front{padding:14px 13px 12px;display:flex;flex-direction:column;gap:5px;height:100%;transition:opacity .15s}
+.dc-n{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--bl)}
+.dc-name{font-family:var(--fb);font-size:12.5px;font-weight:600;color:var(--bk);line-height:1.3;flex:1}
+.dc-tl{font-family:var(--fb);font-size:10.5px;color:var(--mute);line-height:1.4}
+.dc-pri{font-family:var(--fb);font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:3px;align-self:flex-start;margin-top:2px}
+.dc-hover{position:absolute;inset:0;background:#FFFFFF;border:2px solid var(--bl);border-radius:8px;padding:11px 12px 10px;opacity:0;pointer-events:none;display:flex;flex-direction:column;gap:5px;overflow:hidden}
+.dc-hover.visible{opacity:1;pointer-events:all}
+.dh-label{font-family:var(--fb);font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--bl)}
+.dh-title{font-family:var(--fb);font-size:11px;font-weight:700;color:var(--bk);line-height:1.25;padding-bottom:5px;border-bottom:1.5px solid var(--bl);margin-bottom:2px}
+.dh-effet{font-family:var(--fb);font-size:9.5px;color:var(--sub);line-height:1.4}
+.dh-effet strong{color:var(--bk);font-weight:600}
+.dh-list{list-style:none;display:flex;flex-direction:column;gap:2px;flex:1;overflow:hidden}
+.dh-list li{font-family:var(--fb);font-size:9.5px;color:var(--ink);line-height:1.4;padding-left:10px;position:relative}
+.dh-list li::before{content:'—';position:absolute;left:0;color:var(--bl);font-weight:700}
+.dh-fond{font-family:var(--fb);font-size:9px;color:var(--mute);line-height:1.3;border-top:1px solid var(--brd);padding-top:4px}
+.dh-fond strong{color:var(--sub);font-weight:600}
+.dh-tags{display:flex;flex-wrap:wrap;gap:3px}
+.dh-dl{display:flex;flex-direction:column;gap:4px;padding-top:5px;border-top:1px solid var(--brd)}
+.dh-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 8px;border-radius:4px;font-family:var(--fb);font-size:10px;font-weight:700;text-decoration:none;transition:all .15s;text-align:center;width:100%}
+.dh-btn-p{background:var(--bl);color:#FFFFFF}.dh-btn-p:hover{background:var(--bl2)}
+.dh-btn-s{background:var(--bg);color:var(--bk);border:1.5px solid var(--brd)}.dh-btn-s:hover{border-color:var(--bl);color:var(--bl)}
+
+/* ── hover fix ── */
+.dc-hover{transition:opacity .18s}
+.dc-hover.visible{opacity:1 !important;pointer-events:all !important}
+.dh-btn{font-size:10.5px !important;padding:7px 10px !important;font-weight:700 !important}
+.dh-btn-p{background:#0A5CFF !important;color:#FFFFFF !important}
+.dh-btn-s{background:#F9FAFB !important;color:#1A1A1A !important;border:1.5px solid #E5E7EB !important}
+.dh-btn-p:hover{background:#003ECF !important}
+.dh-btn-s:hover{border-color:#0A5CFF !important;color:#0A5CFF !important}
+
+/* ── Pack complet boutons slide 5 ── */
+.pack-btns{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.pack-label{font-family:var(--fb);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-right:4px}
+.pack-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:5px;font-family:var(--fb);font-size:11px;font-weight:600;text-decoration:none;transition:all .18s;white-space:nowrap;border:1.5px solid transparent}
+.pack-btn-p{background:var(--bl);color:#fff;border-color:var(--bl)}.pack-btn-p:hover{background:var(--bl2);border-color:var(--bl2)}
+.pack-btn-s{background:var(--wh);color:var(--bk);border-color:var(--brd)}.pack-btn-s:hover{border-color:var(--bl);color:var(--bl)}
+.pack-btn svg{flex-shrink:0}
+
+/* ── Pack complet boutons slide 5 ── */
+.pack-btns{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.pack-label{font-family:var(--fb);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-right:2px;white-space:nowrap}
+.pack-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:5px;font-family:var(--fb);font-size:10.5px;font-weight:600;text-decoration:none;transition:all .18s;white-space:nowrap;line-height:1}
+.pack-btn-p{background:var(--bl);color:#fff}.pack-btn-p:hover{background:var(--bl2)}
+.pack-btn-s{background:var(--wh);color:var(--bk);border:1.5px solid var(--brd)}.pack-btn-s:hover{border-color:var(--bl);color:var(--bl)}
+</style>
+</head>
+<body>
+<div id="prog"><div id="pf"></div></div>
+
+
+<!-- ══ SLIDE 0 — COVER ══ -->
+<div class="slide" id="sl0">
+  <div class="sbd">
+    <div class="s1-wrap">
+      <div class="s1-kicker">R&egrave;glement (UE) 2024/1689 &middot; Intelligence Artificielle &middot; Juin 2026</div>
+      <div class="s1-mid">
+        <h1 class="s1-h1">L&rsquo;AI Act&nbsp;: Ce que les dirigeants<br>de <span class="ac">PME&thinsp;/&thinsp;PMI</span> doivent savoir</h1>
+        <p class="s1-sub">Comprendre le r&egrave;glement europ&eacute;en et ses cons&eacute;quences op&eacute;rationnelles.</p>
+        <div class="s1-pills">
+          <div class="s1-pill"><div class="s1-dot" style="background:#15803D"></div>1er cadre mondial sur l&rsquo;IA</div>
+          <div class="s1-pill"><div class="s1-dot" style="background:var(--bl)"></div>S&rsquo;applique &agrave; toutes les entreprises utilisatrices</div>
+          <div class="s1-pill"><div class="s1-dot" style="background:var(--am)"></div>Logique de proportionnalit&eacute; selon le risque</div>
+        </div>
+      </div>
+      <div class="s1-foot">
+        <div class="s1-date">PUISSANCE AI &middot; Juin 2026</div>
+        <div class="s1-brand">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L13.73 8.27L20 7L15.27 12L20 17L13.73 15.73L12 22L10.27 15.73L4 17L8.73 12L4 7L10.27 8.27Z" fill="#0A5CFF"/></svg>
+          <b>puissance</b>AI
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 1 — SYNTHÈSE ══ -->
+<div class="slide" id="sl1">
+  <div class="sbd">
+    <div class="pad">
+      <div class="slide-header">
+        <div><div class="slide-label">01 &mdash; Synth&egrave;se ex&eacute;cutive</div><div class="slide-title">Ce que l&rsquo;AI Act change<br>pour votre entreprise</div></div>
+        <div class="slide-num">01</div>
+      </div>
+      <div class="s2-cols">
+        <div class="s2-col">
+          <div class="s2-num">&#9312;</div>
+          <div class="s2-head">1er cadre mondial complet sur l&rsquo;IA</div>
+          <div class="s2-body">Le R&egrave;glement (UE) 2024/1689 est entr&eacute; en vigueur le 1er ao&ucirc;t 2024. C&rsquo;est le <strong>premier corpus r&eacute;glementaire complet au monde</strong> consacr&eacute; &agrave; l&rsquo;IA. Il s&rsquo;applique &agrave; toute organisation utilisant des syst&egrave;mes d&rsquo;IA sur le sol europ&eacute;en, quelle que soit sa taille ou son secteur.</div>
+          <div class="s2-badge s2bb">En vigueur depuis ao&ucirc;t 2024</div>
+        </div>
+        <div class="s2-col">
+          <div class="s2-num">&#9313;</div>
+          <div class="s2-head">Toutes les entreprises sont concern&eacute;es</div>
+          <div class="s2-body">L&rsquo;AI Act ne s&rsquo;applique pas qu&rsquo;aux &eacute;diteurs. Toute PME utilisant ChatGPT, Copilot, Gemini ou tout logiciel avec fonctions IA est un <strong>D&eacute;ployeur</strong> avec des obligations concr&egrave;tes. L&rsquo;ignorance n&rsquo;est pas une d&eacute;fense recevable.</div>
+          <div class="s2-badge s2br">Vous &ecirc;tes un D&eacute;ployeur</div>
+        </div>
+        <div class="s2-col">
+          <div class="s2-num">&#9314;</div>
+          <div class="s2-head">Une logique de proportionnalit&eacute; par le risque</div>
+          <div class="s2-body">Les obligations varient selon le <strong>niveau de risque</strong>. Un outil de r&eacute;daction rel&egrave;ve du risque minimal. Un logiciel de recrutement IA ou d&rsquo;&eacute;valuation des performances rel&egrave;ve du risque &eacute;lev&eacute;, avec des obligations strictes.</div>
+          <div class="s2-badge s2ba">Approche par les risques</div>
+        </div>
+      </div>
+      <div class="s2-quote">&laquo;&thinsp;L&rsquo;AI Act ne vise pas &agrave; freiner l&rsquo;innovation &mdash; il vise &agrave; la rendre <strong>durable et responsable</strong>. Les entreprises qui s&rsquo;y pr&eacute;parent correctement en sortent avec un <strong>avantage concurrentiel r&eacute;el</strong>.&thinsp;&raquo;</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 2 — CALENDRIER ══ -->
+<div class="slide" id="sl2">
+  <div class="sbd">
+    <div class="pad">
+      <div class="slide-header">
+        <div><div class="slide-label">02 &mdash; Calendrier r&eacute;glementaire</div><div class="slide-title">Les &eacute;ch&eacute;ances qui vous<br>concernent directement</div></div>
+        <div class="slide-num">02</div>
+      </div>
+      <div class="dep-box">
+        <div class="dep-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <div class="dep-txt"><strong>Votre statut&nbsp;: D&eacute;ployeur.</strong> Toute entreprise utilisant un syst&egrave;me d&rsquo;IA est un D&eacute;ployeur. Cela inclut ChatGPT, Copilot, Claude, Gemini et tout logiciel m&eacute;tier (CRM, RH, ERP) avec fonctions IA. <strong>La quasi-totalit&eacute; des PME fran&ccedil;aises sont des D&eacute;ployeurs soumis &agrave; l&rsquo;AI Act.</strong></div>
+      </div>
+      <div class="tl">
+        <div class="tl-spine"></div>
+        <div class="tl-row past"><div class="tl-node"></div><div class="tl-lbl">F&eacute;v. 2025</div><div class="tl-status">&#10003; En vigueur</div><div class="tl-ttl">Interdiction des pratiques IA prohib&eacute;es</div><div class="tl-desc">Manipulation subliminale, scoring social, biom&eacute;trie de masse &mdash; interdits imm&eacute;diatement.</div><div class="tl-ok">&#10003; V&eacute;rifiez vos usages actuels d&egrave;s maintenant</div></div>
+        <div class="tl-row past"><div class="tl-node"></div><div class="tl-lbl">Ao&ucirc;t 2025</div><div class="tl-status">&#10003; En vigueur</div><div class="tl-ttl">Obligations sur les mod&egrave;les IA &agrave; usage g&eacute;n&eacute;ral (GPAI)</div><div class="tl-desc">GPT-4o, Claude, Gemini &mdash; v&eacute;rifiez qu&rsquo;un DPA est sign&eacute; avec chaque fournisseur.</div><div class="tl-ok">&#10003; V&eacute;rifiez CGU et DPA de vos fournisseurs</div></div>
+        <div class="tl-row now"><div class="tl-node"></div><div class="tl-lbl">2 ao&ucirc;t 2026</div><div class="tl-hl"><div class="tl-status">&#9889; &Eacute;ch&eacute;ance critique &mdash; dans 58 jours</div><div class="tl-ttl">Obligations des D&eacute;ployeurs &mdash; syst&egrave;mes IA &agrave; risque &eacute;lev&eacute;</div><div class="tl-desc">Recrutement IA, &eacute;valuation performance, scoring cr&eacute;dit&nbsp;: documentation formelle, supervision humaine, enregistrement EU. Toutes les PME concern&eacute;es.</div><div class="tl-sanc">&#9888; Sanctions&nbsp;: jusqu&rsquo;&agrave; 35&nbsp;M&euro; ou 7&nbsp;% du CA mondial</div></div></div>
+        <div class="tl-row future"><div class="tl-node"></div><div class="tl-lbl">Ao&ucirc;t 2027</div><div class="tl-status">&Agrave; pr&eacute;parer</div><div class="tl-ttl">Extension aux syst&egrave;mes IA existants</div><div class="tl-desc">Application aux IA embarqu&eacute;es dans vos logiciels m&eacute;tier. Votre Charte IA sera le document de conformit&eacute; d&eacute;montrable.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 3 — 3 HORIZONS ══ -->
+<div class="slide" id="sl3">
+  <div class="sbd" style="background:var(--bg)">
+    <div class="pad">
+      <div class="slide-header">
+        <div><div class="slide-label">03 &mdash; La solution</div><div class="slide-title">Trois horizons,<br>une trajectoire de conformit&eacute;</div></div>
+        <div class="slide-num">03</div>
+      </div>
+      <div class="rg">
+        <div class="rc rc0">
+          <div class="rc-tag">AI PIVOT &middot; Imm&eacute;diat</div>
+          <div class="rc-name">Starter-Kit</div>
+          <div class="rc-desc">Protection imm&eacute;diate et opposable. Le minimum vital document&eacute;, activable en une journ&eacute;e de travail.</div>
+          <div class="rc-div"></div>
+          <div class="rc-items">
+            <div class="rc-item"><div class="rc-dot"></div><span>7 documents pr&ecirc;ts &agrave; l&rsquo;emploi</span></div>
+            <div class="rc-item"><div class="rc-dot"></div><span>D&eacute;signation du R&eacute;f&eacute;rent IA</span></div>
+            <div class="rc-item"><div class="rc-dot"></div><span>Bouclier juridique dirigeant d&egrave;s la signature</span></div>
+            <div class="rc-item"><div class="rc-dot"></div><span>Registre des outils IA autoris&eacute;s</span></div>
+          </div>
+          <div class="rc-ams-block">
+            <div class="rc-ams-text">
+              <div class="rc-ams-label">Inclus dans le Starter-Kit</div>
+              <div class="rc-ams-title">AI Maturity Score</div>
+              <div class="rc-ams-sub">Diagnostiquez votre maturit&eacute; IA en 10 minutes. Scannez le QR code.</div>
+            </div>
+            <div class="rc-qr"><img src="data:image/png;base64,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" alt="QR AI Maturity Score"></div>
+          </div>
+        </div>
+        <div class="rc rc1">
+          <div class="rc-tag">AI BOOST</div>
+          <div class="rc-name">Charte IA Light personnalis&eacute;e</div>
+          <div class="rc-desc">Co-construite avec vos &eacute;quipes. Remplace et annule les 7 documents provisoires du Starter-Kit.</div>
+          <div class="rc-div"></div>
+          <div class="rc-items">
+            <div class="rc-item"><div class="rc-dot"></div><span>Cartographie des usages r&eacute;els (Shadow AI)</span></div>
+            <div class="rc-item"><div class="rc-dot"></div><span>Comit&eacute; IA constitu&eacute; &mdash; 5 &agrave; 10 personnes</span></div>
+            <div class="rc-item"><div class="rc-dot"></div><span>7 blocs de gouvernance &mdash; 2 &agrave; 3 pages</span></div>
+            <div class="rc-item"><div class="rc-dot"></div><span>Consultation CSE conforme AI Act art. 4</span></div>
+          </div>
+        </div>
+        <div class="rc rc2">
+          <div class="rc-tag">TASK FORCE</div>
+          <div class="rc-name">Sch&eacute;ma Directeur IA</div>
+          <div class="rc-desc">Gouvernance strat&eacute;gique sur 18 &agrave; 36 mois. L&rsquo;IA comme levier de performance durable.</div>
+          <div class="rc-div"></div>
+          <div class="rc-items">
+            <div class="rc-item"><div class="rc-dot"></div><span>Vision &amp; ambition IA sur 3 ans</span></div>
+            <div class="rc-item"><div class="rc-dot"></div><span>Portefeuille de projets IA prioris&eacute;s</span></div>
+            <div class="rc-item"><div class="rc-dot"></div><span>Architecture technologique &amp; souverainet&eacute;</span></div>
+            <div class="rc-item"><div class="rc-dot"></div><span>Plan de formation et mont&eacute;e en comp&eacute;tences</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 4 — 8 DOCUMENTS avec HOVER ══ -->
+<div class="slide" id="sl4">
+  <div class="sbd">
+    <div class="s5-pad">
+      <div class="slide-header">
+        <div><div class="slide-label">04 &mdash; Starter-Kit &middot; Pack Jour 0</div><div class="slide-title">Les 8 documents du Starter-Kit</div></div>
+        <div class="pack-btns"><span class="pack-label">Pack complet</span><a class="pack-btn pack-btn-p" href="https://docs.google.com/document/d/1VB_oZBgG-6utlZoM-oTWCbY4KmEbA8UlWjQnXZbklMk/export?format=docx" target="_blank"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>&nbsp;&lt;&thinsp;50 sal.</a><a class="pack-btn pack-btn-s" href="https://docs.google.com/document/d/1jST9L3duIM00As8hXAnw1vgJIa7DF5FnWVFOY0m3OMM/export?format=docx" target="_blank"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>&nbsp;&gt;&thinsp;50 sal.</a></div>
+        <div class="slide-num">04</div>
+      </div>
+      <div class="dg">
+<div class="dc" onmouseenter="hov(this,1)" onmouseleave="hov(this,0)">
+  <div class="dc-front">
+    <div class="dc-n">Doc 1/7</div>
+    <div class="dc-name">Déclaration de Politique IA — Bouclier Juridique Dirigeant</div>
+    <div class="dc-tl">Preuve de diligence raisonnable, effet immédiat à la signature</div>
+    <span class="dc-pri pr">Urgence J1</span>
+  </div>
+  <div class="dc-hover">
+    <div class="dh-label">Doc 1/7</div>
+    <div class="dh-title">Déclaration de Politique IA — Bouclier Juridique Dirigeant</div>
+    <div class="dh-effet"><strong>Effet&nbsp;:</strong> Immédiat à la signature</div>
+    <ul class="dh-list"><li>Désigne le Référent IA avec mission de mise en conformité sous 30 jours</li><li>Suspend tout outil IA non répertorié dans le Registre (Doc 5)</li><li>Interdit la saisie de données sensibles dans les outils non approuvés</li><li>Communication obligatoire à tous les collaborateurs sous 48h (email AR)</li><li>Calendrier d'actions S1 à S4 intégré — plan 30 jours</li></ul>
+    <div class="dh-fond"><strong>Fondements&nbsp;:</strong> Art. 223-1 C. pén. · AI Act art. 4 · RGPD art. 5 · L. 2312-8 C. trav.</div>
+    <div class="dh-tags"><span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FFE4E4;color:#B91C1C">Urgence J1</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#EBF0FF;color:#0A5CFF">Tous profils</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#EBF0FF;color:#0A5CFF">Effet immédiat</span> </div>
+    <div class="dh-dl">
+      <a class="dh-btn dh-btn-p" href="https://docs.google.com/document/d/1yHrnWxjwer5MP5Lo4UgAsIbsevQWkZo4mklsP4MsH1w/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &lt;&nbsp;50 salariés</a>
+      <a class="dh-btn dh-btn-s" href="https://docs.google.com/document/d/1aUGnejMNysqJVYiiwpfIg23cvftWU9Tzmj6_ok-YADE/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &gt;&nbsp;50 salariés</a>
+    </div>
+  </div>
+</div>
+<div class="dc" onmouseenter="hov(this,1)" onmouseleave="hov(this,0)">
+  <div class="dc-front">
+    <div class="dc-n">Doc 2/7</div>
+    <div class="dc-name">Guide RH &amp; Avenant type</div>
+    <div class="dc-tl">Obligations IA opposables à chaque salarié</div>
+    <span class="dc-pri pa">Semaine 2</span>
+  </div>
+  <div class="dc-hover">
+    <div class="dh-label">Doc 2/7</div>
+    <div class="dh-title">Guide RH &amp; Avenant type</div>
+    <div class="dh-effet"><strong>Effet&nbsp;:</strong> Procédure 15 jours de réflexion minimum</div>
+    <ul class="dh-list"><li>Clause universelle pour fiches de poste (tous postes)</li><li>Clause renforcée pour postes à usage IA régulier (commercial, RH, finance)</li><li>Mentions obligatoires pour annonces de recrutement</li><li>Article type pour nouveaux contrats (5 articles couvrant conformité, PI, données)</li><li>Avenant type pour salariés en poste — délai 15 jours minimum</li></ul>
+    <div class="dh-fond"><strong>Fondements&nbsp;:</strong> Code du travail · Art. L. 1121-1 · CJUE C-55/18</div>
+    <div class="dh-tags"><span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FEF3C7;color:#92400E">Semaine 2</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FEF3C7;color:#92400E">Avocat recommandé &lt;50</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FFE4E4;color:#B91C1C">Avocat obligatoire &gt;50</span> </div>
+    <div class="dh-dl">
+      <a class="dh-btn dh-btn-p" href="https://docs.google.com/document/d/1ofwyzzaszcZ-T4BzCfTpVFcf5DTeypPebUy5DQHmM6M/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &lt;&nbsp;50 salariés</a>
+      <a class="dh-btn dh-btn-s" href="https://docs.google.com/document/d/1yRbtg7sdpe76_IPZW-3hIpluTQRbHQS1vB4CpsS7ssA/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &gt;&nbsp;50 salariés</a>
+    </div>
+  </div>
+</div>
+<div class="dc" onmouseenter="hov(this,1)" onmouseleave="hov(this,0)">
+  <div class="dc-front">
+    <div class="dc-n">Doc 3/7</div>
+    <div class="dc-name">Charte de Propriété Intellectuelle IA</div>
+    <div class="dc-tl">Tout ce que vos équipes produisent avec l'IA appartient à l'entreprise</div>
+    <span class="dc-pri pb">Semaine 1</span>
+  </div>
+  <div class="dc-hover">
+    <div class="dh-label">Doc 3/7</div>
+    <div class="dh-title">Charte de Propriété Intellectuelle IA</div>
+    <div class="dh-effet"><strong>Effet&nbsp;:</strong> Immédiat à la communication</div>
+    <ul class="dh-list"><li>Mécanisme 1 — Secret des affaires : protection immédiate, sans formalité</li><li>Mécanisme 2 — Droit d'auteur salarié : droits patrimoniaux à l'Employeur</li><li>Mécanisme 3 — Protection contractuelle : opposable sans droit d'auteur constitué</li><li>Périmètre : textes, code, visuels, analyses, traductions, prompts à valeur commerciale</li><li>Obligation de conservation des traces (prompts, historiques, brouillons)</li></ul>
+    <div class="dh-fond"><strong>Fondements&nbsp;:</strong> Loi 2018-670 · CPI art. L113-9 · C. civ. art. 1103</div>
+    <div class="dh-tags"><span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#EBF0FF;color:#0A5CFF">Semaine 1</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#EBF0FF;color:#0A5CFF">Tous profils</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#EBF0FF;color:#0A5CFF">Effet dès communication</span> </div>
+    <div class="dh-dl">
+      <a class="dh-btn dh-btn-p" href="https://docs.google.com/document/d/1SJ2Yy3XPLs7nwXBLHzqFbuLsY1N3qoJWcB0CSV8UBdY/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &lt;&nbsp;50 salariés</a>
+      <a class="dh-btn dh-btn-s" href="https://docs.google.com/document/d/1DmZ1CKZMGmwLzwfRrkpu_bc-U3O3KNRGpO--rNu2_AA/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &gt;&nbsp;50 salariés</a>
+    </div>
+  </div>
+</div>
+<div class="dc" onmouseenter="hov(this,1)" onmouseleave="hov(this,0)">
+  <div class="dc-front">
+    <div class="dc-n">Doc 4/7</div>
+    <div class="dc-name">Note d'Information au CSE</div>
+    <div class="dc-tl">Protège contre le délit d'entrave — responsabilité pénale non assurable</div>
+    <span class="dc-pri pa">Obligatoire ≥11 sal.</span>
+  </div>
+  <div class="dc-hover">
+    <div class="dh-label">Doc 4/7</div>
+    <div class="dh-title">Note d'Information au CSE</div>
+    <div class="dh-effet"><strong>Effet&nbsp;:</strong> Information préalable J0 — consultation formelle J+30</div>
+    <ul class="dh-list"><li>Obligatoire dès 11 salariés — délit d'entrave = 1 an de prison + 7 500€</li><li>Constitue une INFORMATION préalable (pas une consultation formelle)</li><li>La consultation formelle interviendra lors de la présentation de la Charte IA J+30</li><li>Conserver impérativement la preuve de remise (email AR ou signature secrétaire CSE)</li><li>Aucune modification substantielle des conditions de travail introduite à ce stade</li></ul>
+    <div class="dh-fond"><strong>Fondements&nbsp;:</strong> Art. L. 2312-8 C. trav. · Art. L. 2328-1 C. trav.</div>
+    <div class="dh-tags"><span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FFE4E4;color:#B91C1C">Pénal non assurable</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FEF3C7;color:#92400E">Obligatoire ≥11 sal.</span> </div>
+    <div class="dh-dl">
+      <a class="dh-btn dh-btn-p" href="https://docs.google.com/document/d/144zPijXO8Vu8xbIjLIzgxrA9oOpoEeMZP7wQ7C6Zu04/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &lt;&nbsp;50 salariés</a>
+      <a class="dh-btn dh-btn-s" href="https://docs.google.com/document/d/1Hk0eFuA2GB-uKKIXNxxwoeMikMVvRDw91H6jfC6LShw/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &gt;&nbsp;50 salariés</a>
+    </div>
+  </div>
+</div>
+<div class="dc" onmouseenter="hov(this,1)" onmouseleave="hov(this,0)">
+  <div class="dc-front">
+    <div class="dc-n">Doc 4-bis</div>
+    <div class="dc-name">Note aux Délégués Syndicaux</div>
+    <div class="dc-tl">Document distinct du Doc 4 — remis simultanément, séparément</div>
+    <span class="dc-pri pa">Si DS présents</span>
+  </div>
+  <div class="dc-hover">
+    <div class="dh-label">Doc 4-bis</div>
+    <div class="dh-title">Note aux Délégués Syndicaux</div>
+    <div class="dh-effet"><strong>Effet&nbsp;:</strong> Si délégués syndicaux désignés dans l'entreprise</div>
+    <ul class="dh-list"><li>Document DISTINCT du Doc 4 — accusé de réception séparé obligatoire</li><li>Son absence peut constituer une entrave au droit syndical — délit pénal</li><li>Propose une réunion dans les 15 jours pour présenter la démarche</li><li>Évalue l'opportunité d'un accord collectif d'entreprise sur l'IA</li><li>Un accord collectif s'imposerait sans nécessiter d'avenant individuel</li></ul>
+    <div class="dh-fond"><strong>Fondements&nbsp;:</strong> Art. L. 2146-1 C. trav. · Art. L. 2232-11 C. trav.</div>
+    <div class="dh-tags"><span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FEF3C7;color:#92400E">Si DS présents</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FFE4E4;color:#B91C1C">Délit pénal si absent</span> </div>
+    <div class="dh-dl">
+      <a class="dh-btn dh-btn-p" href="https://docs.google.com/document/d/1EJvxNMy8W0AA0vvbd3YrKq3WPA-LyDPZlC0euwmmn3g/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &lt;&nbsp;50 salariés</a>
+      <a class="dh-btn dh-btn-s" href="https://docs.google.com/document/d/12VH0XuOlnXO1-88rV9-z1wV6nAwPo7NuxJdy2c4L5nM/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &gt;&nbsp;50 salariés</a>
+    </div>
+  </div>
+</div>
+<div class="dc" onmouseenter="hov(this,1)" onmouseleave="hov(this,0)">
+  <div class="dc-front">
+    <div class="dc-n">Doc 5/7</div>
+    <div class="dc-name">Registre des Outils IA Autorisés</div>
+    <div class="dc-tl">Tout outil non listé est interdit par défaut — réponse directe au Shadow AI</div>
+    <span class="dc-pri pb">Semaine 1</span>
+  </div>
+  <div class="dc-hover">
+    <div class="dh-label">Doc 5/7</div>
+    <div class="dh-title">Registre des Outils IA Autorisés</div>
+    <div class="dh-effet"><strong>Effet&nbsp;:</strong> Immédiat à l'établissement</div>
+    <ul class="dh-list"><li>Principe fondamental : tout outil non inscrit est présumé interdit</li><li>Pré-renseigné : ChatGPT, Copilot, Claude, Gemini, Mistral AI avec conditions</li><li>Classement par niveau de risque AI Act (Minimal / Limité / Haut risque / Interdit)</li><li>Procédure d'autorisation d'un nouvel outil en 5 jours ouvrés</li><li>Option entraînement désactivée requise pour chaque outil autorisé</li></ul>
+    <div class="dh-fond"><strong>Fondements&nbsp;:</strong> AI Act art. 4 · RGPD art. 5 · Règlement (UE) 2024/1689</div>
+    <div class="dh-tags"><span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#EBF0FF;color:#0A5CFF">Semaine 1</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#EBF0FF;color:#0A5CFF">Tous profils</span> </div>
+    <div class="dh-dl">
+      <a class="dh-btn dh-btn-p" href="https://docs.google.com/document/d/1-vFX7DgsBh6B-b5j-Wfj3g34xRkhXA_gyuVe90Gnp8A/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &lt;&nbsp;50 salariés</a>
+      <a class="dh-btn dh-btn-s" href="https://docs.google.com/document/d/1PzbTfkxcDNtUMvdr2qAekU_O2QmjQFo8T2gSCkCkhB4/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &gt;&nbsp;50 salariés</a>
+    </div>
+  </div>
+</div>
+<div class="dc" onmouseenter="hov(this,1)" onmouseleave="hov(this,0)">
+  <div class="dc-front">
+    <div class="dc-n">Doc 6/7</div>
+    <div class="dc-name">Checklist CGU Fournisseurs IA</div>
+    <div class="dc-tl">L'angle mort le plus dangereux — actionnable en 2 heures</div>
+    <span class="dc-pri pr">Priorité absolue S1</span>
+  </div>
+  <div class="dc-hover">
+    <div class="dh-label">Doc 6/7</div>
+    <div class="dh-title">Checklist CGU Fournisseurs IA</div>
+    <div class="dh-effet"><strong>Effet&nbsp;:</strong> Priorité absolue S1 — 10 minutes par outil</div>
+    <ul class="dh-list"><li>Risque : option entraînement non désactivée = vos données entraînent des modèles concurrents</li><li>OpenAI ChatGPT : Settings → Data Controls → décocher 'Improve the model'</li><li>Anthropic Claude : Paramètres → Confidentialité → désactiver l'entraînement</li><li>Google Gemini : Admin Console → désactiver 'Gemini Apps Activity' pour le domaine</li><li>Microsoft Copilot : M365 Admin Center → Org Settings → désactiver collecte</li></ul>
+    <div class="dh-fond"><strong>Fondements&nbsp;:</strong> RGPD art. 28 · AI Act art. 4 · SCCs RGPD</div>
+    <div class="dh-tags"><span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FFE4E4;color:#B91C1C">Priorité absolue S1</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#EBF0FF;color:#0A5CFF">Tous profils</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FFE4E4;color:#B91C1C">2 heures</span> </div>
+    <div class="dh-dl">
+      <a class="dh-btn dh-btn-p" href="https://docs.google.com/document/d/1ruIKFTDC5vu5lsTJRPojQmqQWjryTxTYIqbhzO1YOko/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &lt;&nbsp;50 salariés</a>
+      <a class="dh-btn dh-btn-s" href="https://docs.google.com/document/d/1gtVQdHu_ZOd_lnHVuP9vng0jNOENpiQwS1nJHH6NUg0/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &gt;&nbsp;50 salariés</a>
+    </div>
+  </div>
+</div>
+<div class="dc" onmouseenter="hov(this,1)" onmouseleave="hov(this,0)">
+  <div class="dc-front">
+    <div class="dc-n">Doc 7/7</div>
+    <div class="dc-name">Délégation de Pouvoir au Référent IA</div>
+    <div class="dc-tl">Transfert partiel de responsabilité pénale opérationnelle du dirigeant</div>
+    <span class="dc-pri pg">Recommandé ≥50 sal.</span>
+  </div>
+  <div class="dc-hover">
+    <div class="dh-label">Doc 7/7</div>
+    <div class="dh-title">Délégation de Pouvoir au Référent IA</div>
+    <div class="dh-effet"><strong>Effet&nbsp;:</strong> Après validation par un avocat spécialisé</div>
+    <ul class="dh-list"><li>3 conditions cumulatives : compétence, autorité réelle, acceptation expresse par écrit</li><li>Périmètre délégué : Registre IA, autorisation outils, CGU, incidents, formations</li><li>Le Référent IA ne peut pas être élu CSE ou délégué syndical (conflit d'intérêts)</li><li>Moyens requis : accès admin outils IA, budget dédié, temps alloué</li><li>Reddition de comptes : rapport mensuel Direction + rapport annuel maturité IA</li></ul>
+    <div class="dh-fond"><strong>Fondements&nbsp;:</strong> Jurisprudence Cass. crim. · Droit pénal des affaires</div>
+    <div class="dh-tags"><span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#F0FDF4;color:#15803D">Recommandé ≥50 sal.</span> <span style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:#FFE4E4;color:#B91C1C">Avocat requis</span> </div>
+    <div class="dh-dl">
+      <a class="dh-btn dh-btn-p" href="https://docs.google.com/document/d/1UlOE1uLVqISXwSrWXOS6BpksqLbHjHm7EYR8nsJacGI/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &lt;&nbsp;50 salariés</a>
+      <a class="dh-btn dh-btn-s" href="https://docs.google.com/document/d/1EcwVo0lYxcGqF0RA_1r4Nux-hRSjgn7GBFE5L9SLRdw/export?format=docx" target="_blank">&#8659;&nbsp;Télécharger — &gt;&nbsp;50 salariés</a>
+    </div>
+  </div>
+</div>
+</div>
+      <div class="dl-note">Survolez chaque document pour le t&eacute;l&eacute;charger individuellement en version &lt;&nbsp;50 ou &gt;&nbsp;50 salari&eacute;s.</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div id="nav">
+  <button class="nb" id="bp" onclick="go(-1)" disabled>&#8592;</button>
+  <span id="sc">1 / 5</span>
+  <button class="nb" id="bn" onclick="go(1)">&#8594;</button>
+</div>
+
+<!-- PANEL -->
+<script>
+
+function hov(el, show) {
+  var h = el.querySelector('.dc-hover');
+  var f = el.querySelector('.dc-front');
+  if (show) {
+    h.classList.add('visible');
+    f.style.opacity = '0';
+  } else {
+    h.classList.remove('visible');
+    f.style.opacity = '1';
+  }
+}
+var p = 0, n = 5;
+function go(d) {
+  document.getElementById('sl'+p).style.display = 'none';
+  p = p + d;
+  if (p < 0) p = 0;
+  if (p >= n) p = n - 1;
+  document.getElementById('sl'+p).style.display = 'flex';
+  document.getElementById('sc').textContent = (p+1) + ' / ' + n;
+  document.getElementById('bp').disabled = (p === 0);
+  document.getElementById('bn').disabled = (p === n-1);
+  document.getElementById('pf').style.width = (p === 0 ? '0' : Math.round(p/(n-1)*100)) + '%';
+}
+document.onkeydown = function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+};
+
+
+function showHov(el) { /* handled by CSS :hover */ }
+function hideHov(el) { /* handled by CSS :hover */ }
+</script>
+</body>
+</html>
